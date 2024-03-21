@@ -6,6 +6,9 @@
 
 {% block body %}
     <h1>Edit</h1>
-    {{ form2.content }}
-    <input type="submit">
+    <form method="post">
+        {% csrf_token %}
+        {{ form2.content }}
+        <input type="submit" value="Save">
+    </form>
 {% endblock %}

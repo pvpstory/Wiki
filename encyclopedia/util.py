@@ -2,6 +2,7 @@ import re
 
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
+import markdown2
 
 
 def list_entries():
@@ -32,6 +33,8 @@ def get_entry(title):
     """
     try:
         f = default_storage.open(f"entries/{title}.md")
-        return f.read().decode("utf-8")
+        markdown = f.read().decode("utf-8")
+        Html = markdown2.markdown(markdown)
+        return Html
     except FileNotFoundError:
         return None
