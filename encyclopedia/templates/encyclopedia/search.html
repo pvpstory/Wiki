@@ -5,14 +5,21 @@
 {% endblock %}
 
 {% block body %}
-    <h1>Similar results</h1>
+    
 
     <ul>
-        {% for entry in entries%}
-        {% if title in entry %}    
-            <li><a href="/wiki/{{ entry }}">{{ entry }}</a></li>
-        {% endif %}    
-        {% endfor %}
+        
+        
+                    
+        {% if titles %}
+            <h1>Similar results</h1>
+            {% for entry in titles %}
+                <li><a href="/wiki/{{ entry }}">{{ entry }}</a></li>
+            {% endfor %}
+        {% else %}
+            <h1>No such results</h1>
+        {% endif %}
+        
     </ul>
 
 {% endblock %}

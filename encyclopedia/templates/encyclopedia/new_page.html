@@ -6,11 +6,13 @@
 
 {% block body %}
     <h1>Create a new entry</h1>
-    <form action="" method = "post">
-        {% csrf_token %}
-        {{ form2.title }}
-        {{ form2.content }}
-        <input type="submit">
-    </form>
+    <form action="" method="post">
+    {% csrf_token %}
+    <h3>Title</h3>
+    {{ form2.title }}
+    <h3>Content</h3>
+    {{ form2.content }}
+    <input type="submit">
+</form>
 
 {% endblock %}

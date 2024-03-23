@@ -1,6 +1,7 @@
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django import forms
+
 from . import util
 import random
 
@@ -13,7 +14,7 @@ class New_page(forms.Form):
 class EditPage(forms.Form):
     content = forms.CharField(widget=forms.Textarea)
 
-#<input class="search" type="text" name="q" placeholder="Search Encyclopedia">
+
 def index(request):
 
     if request.method == "POST":
@@ -21,8 +22,13 @@ def index(request):
         if form.is_valid():
             title = form.cleaned_data["title"]
             if util.get_entry(title) is None:
+                list = []
+                for entry in util.list_entries():
+                    if title in entry:
+                        list.append(entry)
                 return render(request, "encyclopedia/search.html", {
-                    "title": title, "entries": util.list_entries()
+                    "title": title, "entries": util.list_entries(),"form":NewTaskForm(),
+                    "titles": list
                 })
             return render(request, "encyclopedia/wiki.html", {
                 "content": util.get_entry(title), "title": title,"form":NewTaskForm()
@@ -39,13 +45,23 @@ def wiki(request, title):
         if form.is_valid():
             title = form.cleaned_data["title"]
             if util.get_entry(title) is None:
-                return HttpResponse("error")
+                if util.get_entry(title) is None:
+                    list = []
+                    for entry in util.list_entries():
+                        if title in entry:
+                            list.append(entry)
+                    return render(request, "encyclopedia/search.html", {
+                        "title": title, "entries": util.list_entries(), "form": NewTaskForm(),
+                        "titles": list
+                    })
             return render(request, "encyclopedia/wiki.html", {
                 "content": util.get_entry(title), "title": title,"form":NewTaskForm()
             })
 
     if util.get_entry(title) is None:
-        return HttpResponse("error")
+        return render(request, "encyclopedia/error.html", {
+            "Error": "The entry not found","form":NewTaskForm()
+        })
     return render(request, "encyclopedia/wiki.html", {
         "content": util.get_entry(title), "title": title, "form": NewTaskForm()
     })
@@ -61,7 +77,9 @@ def new_entry(request):
                     "content": util.get_entry(title), "title": title, "form": NewTaskForm()
                 })
             else:
-                return HttpResponse("error")
+                return render(request, "encyclopedia/error.html", {
+                    "Error": "The entry already exists","form":NewTaskForm()
+                })
     return render(request, "encyclopedia/new_page.html", {
         "form2": New_page(), "form":NewTaskForm()
 
@@ -72,9 +90,7 @@ def edit(request,title):
         if form2.is_valid():
             content = form2.cleaned_data["content"]
             util.save_entry(title, content)
-            return render(request, "encyclopedia/wiki.html", {
-                "content": util.get_entry(title), "title": title, "form": NewTaskForm()
-            })
+            return redirect('wiki', title)
 
 
     data = {'content': util.get_entry(title)}
